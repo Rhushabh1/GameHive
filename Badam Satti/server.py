@@ -38,7 +38,7 @@ class Server:
 		client.sendall(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
 
 
-	def receive_all(self, client, lenght):
+	def receive_all(self, client, length):
 		msg = b""
 		while len(msg) < length:
 			more_msg = client.recv(length - len(msg))
