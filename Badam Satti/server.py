@@ -34,8 +34,26 @@ class Server:
 	# sends {r_type, data} to client
 	def send(self, r_type, data, client):
 		msg = {"type": r_type, "data": data}
-		msg = json.dumps(msg).encode("ascii")
-		client.send(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
+		msg = json.dumps(msg).encode("utf-8")
+		client.sendall(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
+
+
+	# receive client requests
+	def receive(self, client):
+		raw_len = client.recv(4)		# unpack length from first 4 bytes
+		if not raw_len:
+			return None
+
+		(length,) = struct.unpack("!I", raw_len)
+
+		msg = b""
+		while len(msg) < length:
+			more_msg = client.recv(length - len(msg))
+			if not more:
+				return None
+			msg += more_msg
+
+		return json.loads(msg.decode("utf-8"))
 
 
 	# setup the gaming env in room
@@ -51,27 +69,23 @@ class Server:
 	def handle_login(self, client):
 		while not self.kill:
 			self.send(Protocols.Response.NICKNAME, None, client)
-			raw_len = client.recv(4)		# unpack length from first 4 bytes
-			if raw_len:
-				(length,) = struct.unpack("!I", raw_len)
-				msg = client.recv(length)
-				msg =json.loads(msg.decode("ascii"))			# capture client's nickname
-				r_type, nickname = msg.get("type"), msg.get("data")
-				time.sleep(0.001)
+			msg = receive(client)		# capture client's nickname
+			r_type, nickname = msg.get("type"), msg.get("data")
+			time.sleep(0.001)
 
-				if r_type == Protocols.Request.NICKNAME:
-					self.client_names[self.clients.index(client)] = nickname
-				else:
-					continue
+			if r_type == Protocols.Request.NICKNAME:
+				self.client_names[self.clients.index(client)] = nickname
+			else:
+				continue
 
-				if len(self.clients) < self.users:		# send clients to waiting lobby till all users have joined
-					self.waiting_for_players = True
-					print(f"Waiting Lobby = {len(self.clients)} Players")
-					self.send(Protocols.Response.WAIT, None, client)		# inform client to wait
-				else:
-					self.create_room()		# create room since all users have joined
-				
-				break
+			if len(self.clients) < self.users:		# send clients to waiting lobby till all users have joined
+				self.waiting_for_players = True
+				print(f"Waiting Lobby = {len(self.clients)} Players")
+				self.send(Protocols.Response.WAIT, None, client)		# inform client to wait
+			else:
+				self.create_room()		# create room since all users have joined
+			
+			break
 
 
 	# let the clients sleep in the waiting lobby
@@ -114,12 +128,8 @@ class Server:
 		self.waiting_lobby(client)
 		while not self.kill:
 			try:
-				raw_len = client.recv(4)		# unpack length from first 4 bytes
-				if raw_len:
-					(length,) = struct.unpack("!I", raw_len)
-					msg = client.recv(length)
-					msg = json.loads(msg.decode("ascii"))
-					self.handle_receive(msg, client)
+				msg = receive(client)
+				self.handle_receive(msg, client)
 			except socket.timeout:
 				pass
 			except (ConnectionAbortedError, ConnectionResetError):
@@ -180,4 +190,4 @@ class Server:
 
 
 if __name__ == "__main__":
-	Server().run()
+	Server(host = "0.0.0.0").run()

@@ -29,8 +29,26 @@ class Client:
 	# sends request r_type to server along with data
 	def send(self, r_type, data):
 		msg = {"type": r_type, "data": data}
-		msg = json.dumps(msg).encode("ascii")
-		self.server.send(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
+		msg = json.dumps(msg).encode("utf-8")
+		self.server.sendall(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
+
+
+	# receive server responses
+	def receive(self):
+		raw_len = self.server.recv(4)		# unpack length from first 4 bytes
+		if not raw_len:
+			return None
+
+		(length,) = struct.unpack("!I", raw_len)
+
+		msg = b""
+		while len(msg) < length:
+			more_msg = self.server.recv(length - len(msg))
+			if not more:
+				return None
+			msg += more_msg
+
+		return json.loads(msg.decode("utf-8"))
 
 
 	# handle server responses
@@ -63,12 +81,8 @@ class Client:
 		self.server.settimeout(1)
 		while not self.kill:
 			try:
-				raw_len = self.server.recv(4)		# unpack length from first 4 bytes
-				if raw_len:
-					(length,) = struct.unpack("!I", raw_len)
-					msg = self.server.recv(length)
-					msg = json.loads(msg.decode("ascii"))
-					self.handle_receive(msg)
+				msg = self.receive()
+				self.handle_receive(msg)
 			except socket.timeout:
 				pass
 			time.sleep(0.001)
@@ -89,8 +103,8 @@ class Client:
 		threading.Thread(target = self.server_listener).start()
 		try:
 			while not self.kill:
-				self.kill = self.game.handle_events()		# to capture inputs
-				move = self.game.draw(self.started)		# to render screen
+				self.kill = self.game.handle_events()		# to capture inputs (returns kill switch)
+				move = self.game.draw(self.started)		# to render screen (returns move made by the player)
 				if move:
 					self.send(Protocols.Request.MOVE, move)
 			self.game.handle_end()		# when game over
@@ -104,4 +118,4 @@ if __name__ == "__main__":
 	nickname = input("Enter nickname : ")
 	while nickname == "":
 		nickname = input("Enter VALID nickname : ")
-	Client(nickname = nickname).run()
+	Client(host = "100.83.58.23", nickname = nickname).run()
