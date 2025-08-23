@@ -38,22 +38,34 @@ class Server:
 		client.sendall(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
 
 
-	# receive client requests
-	def receive(self, client):
-		raw_len = client.recv(4)		# unpack length from first 4 bytes
-		if not raw_len:
-			return None
-
-		(length,) = struct.unpack("!I", raw_len)
-
+	def receive_all(self, client, lenght):
 		msg = b""
 		while len(msg) < length:
 			more_msg = client.recv(length - len(msg))
 			if not more_msg:
 				return None
 			msg += more_msg
+		return msg
 
-		return json.loads(msg.decode("utf-8"))
+
+	# receive client requests
+	def receive(self, client):
+		raw_len = self.receive_all(client, 4)		# unpack length from first 4 bytes
+		if not raw_len:
+			return None
+
+		(length,) = struct.unpack("!I", raw_len)
+		msg = self.receive_all(client, length)
+		if not msg:
+			return None
+
+		# decode json safely
+		try:
+			return json.loads(msg.decode("utf-8"))
+		except json.JSONDecodeError as e:
+			print("JSON decode error:", e)
+			print("Raw bytes:", msg)
+			return None
 
 
 	# setup the gaming env in room

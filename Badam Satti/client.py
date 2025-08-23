@@ -33,22 +33,34 @@ class Client:
 		self.server.sendall(struct.pack("!I", len(msg)) + msg)		# pack length in first 4 bytes
 
 
-	# receive server responses
-	def receive(self):
-		raw_len = self.server.recv(4)		# unpack length from first 4 bytes
-		if not raw_len:
-			return None
-
-		(length,) = struct.unpack("!I", raw_len)
-
+	def receive_all(self, lenght):
 		msg = b""
 		while len(msg) < length:
 			more_msg = self.server.recv(length - len(msg))
 			if not more_msg:
 				return None
 			msg += more_msg
+		return msg
 
-		return json.loads(msg.decode("utf-8"))
+
+	# receive client requests
+	def receive(self):
+		raw_len = self.receive_all(4)		# unpack length from first 4 bytes
+		if not raw_len:
+			return None
+
+		(length,) = struct.unpack("!I", raw_len)
+		msg = self.receive_all(length)
+		if not msg:
+			return None
+
+		# decode json safely
+		try:
+			return json.loads(msg.decode("utf-8"))
+		except json.JSONDecodeError as e:
+			print("JSON decode error:", e)
+			print("Raw bytes:", msg)
+			return None
 
 
 	# handle server responses
