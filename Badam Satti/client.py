@@ -44,7 +44,7 @@ class Client:
 		msg = b""
 		while len(msg) < length:
 			more_msg = self.server.recv(length - len(msg))
-			if not more:
+			if not more_msg:
 				return None
 			msg += more_msg
 

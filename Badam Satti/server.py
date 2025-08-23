@@ -49,7 +49,7 @@ class Server:
 		msg = b""
 		while len(msg) < length:
 			more_msg = client.recv(length - len(msg))
-			if not more:
+			if not more_msg:
 				return None
 			msg += more_msg
 
@@ -69,7 +69,7 @@ class Server:
 	def handle_login(self, client):
 		while not self.kill:
 			self.send(Protocols.Response.NICKNAME, None, client)
-			msg = receive(client)		# capture client's nickname
+			msg = self.receive(client)		# capture client's nickname
 			r_type, nickname = msg.get("type"), msg.get("data")
 			time.sleep(0.001)
 
@@ -128,7 +128,7 @@ class Server:
 		self.waiting_lobby(client)
 		while not self.kill:
 			try:
-				msg = receive(client)
+				msg = self.receive(client)
 				self.handle_receive(msg, client)
 			except socket.timeout:
 				pass
