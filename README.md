@@ -16,20 +16,20 @@ GameHive is a platform hosting multiple online multiplayer games built in Python
 
 1. Clone the repository:
 
-		$> git clone https://github.com/Rhushabh1/GameHive.git
-		$> cd GameHive
+		git clone https://github.com/Rhushabh1/GameHive.git
+		cd GameHive
 
 2. Run the setup script to install required Python packages:
 
-		$> bash setup.sh
+		bash setup.sh
 
 3. Start the server for your chosen game:
 
-		$> python server.py
+		python server.py
 
 4. Launch the client to play the game:
 
-		$> python client.py
+		python client.py
 
 ## How to Play
 
@@ -42,25 +42,26 @@ GameHive is a platform hosting multiple online multiplayer games built in Python
 
 ## Project Structure
 
-	GameHive/
-	|
-	|-setup.sh 		# installs dependencies
-	|-README.md 		# project documentation
-	|
-	|-<game_name>/
-		|-server.py 		# server handling player connections, synchronizes game state (athoritative)
-		|-client.py 		# client interface for players, communicates with server
-		|-room.py 			# server-side game logic, scoring, and matchmaking
-		|-game.py 			# client-side game logic, rendering game view
-		|-bot.py 			# AI player if human players are insufficient, fills empty slots
-		|-protocols.py 		# server-client communication definitions for message formats
-		|-assets/ 			# digital assets for the game (images, sounds, etc.)
+	GameHive
+	│   README.md 				# project documentation
+	│   requirements.txt 		# python libraries, versions
+	│   setup.sh 				# installs dependencies
+	│
+	├───Badam Satti
+	│   │   bot.py 				# AI player if human players are insufficient, fills empty slots
+	│   │   client.py 			# client interface for players, communicates with server
+	│   │   game.py 			# client-side game logic, rendering game view
+	│   │   protocols.py 		# server-client communication definitions for message formats
+	│   │   room.py 			# server-side game logic, scoring, and matchmaking
+	│   │   server.py 			# server handling player connections, synchronizes game state (athoritative)
+	│   │
+	│   ├───assets 				# digital assets for the game (images, sounds, etc.)
 
 ## Adding New Games
 
-1. create a new folder '''<game_name>/'''
+1. create a new folder ```<game_name>/```
 2. copy the template folder contents into it
-3. implement the required files: '''server.py''', '''client.py''', '''room.py''', '''game.py'''
-4. add assets in the '''assets/''' folder
-5. optional: add bot logic in '''bot.py'''
-6. test the game using '''python server.py''' and '''python client.py'''
+3. implement the required files: ```server.py```, ```client.py```, ```room.py```, ```game.py```
+4. add assets in the ```assets/``` folder
+5. optional: add bot logic in ```bot.py```
+6. test the game using ```python server.py``` and ```python client.py```
