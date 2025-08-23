@@ -1,5 +1,7 @@
 import random
 
+from utils import *
+
 
 class Room:
 	def __init__(self, num_players):

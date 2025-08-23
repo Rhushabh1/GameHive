@@ -47,7 +47,7 @@ GameHive is a platform hosting multiple online multiplayer games built in Python
 	│   requirements.txt 		# python libraries, versions
 	│   setup.sh 				# installs dependencies
 	│
-	├───Badam Satti
+	├───<game_name>
 	│   │   bot.py 				# AI player if human players are insufficient, fills empty slots
 	│   │   client.py 			# client interface for players, communicates with server
 	│   │   game.py 			# client-side game logic, rendering game view
@@ -55,7 +55,9 @@ GameHive is a platform hosting multiple online multiplayer games built in Python
 	│   │   room.py 			# server-side game logic, scoring, and matchmaking
 	│   │   server.py 			# server handling player connections, synchronizes game state (athoritative)
 	│   │
-	│   ├───assets 				# digital assets for the game (images, sounds, etc.)
+	│   └───assets 				# digital assets for the game (images, sounds, etc.)
+	│
+	└───Template
 
 ## Adding New Games
 

@@ -6,6 +6,7 @@ import time
 
 from protocols import Protocols
 from room import Room
+from bot import Bot
 
 
 class Server:

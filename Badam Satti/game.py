@@ -1,6 +1,7 @@
 import sys
-
 import pygame
+
+from utils import *
 
 
 class Game:
@@ -154,10 +155,10 @@ class Game:
 
 		# display leaderboard
 		text_start = (self.row_centers[0][0] + self.row_step[0] * 13 + self.step_size, self.row_centers[0][1])
-		for i, p in enumerate(self.player_names):
-			text = f"{'>' if self.turn == i else ''} {p} -> {self.num_cards[i]}"
+		for i, n in enumerate(self.num_cards):
+			text = f"{'>' if self.turn == i else ''} {self.player_names[i]} -> {n}"
 			if end_screen:
-				text = f"{p} -> {self.rank.index(i) + 1} {'(W)' if self.rank.index(i) == 0 else ''}"
+				text = f"{self.player_names[i]} -> {self.rank.index(i) + 1} {'(W)' if self.rank.index(i) == 0 else ''}"
 			self.screen.blit(self.font.render(text, True, (0, 0, 0)), (text_start[0], text_start[1] + self.step_size * i))
 
 
