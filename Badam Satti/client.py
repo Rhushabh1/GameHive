@@ -65,6 +65,8 @@ class Client:
 
 	# handle server responses
 	def handle_receive(self, msg):
+		if not msg:
+			return
 		r_type, data = msg.get("type"), msg.get("data")
 
 		if r_type == Protocols.Response.GAME_STATE:

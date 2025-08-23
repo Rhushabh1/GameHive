@@ -157,7 +157,7 @@ class Game:
 		for i, p in enumerate(self.player_names):
 			text = f"{'>' if self.turn == i else ''} {p} -> {self.num_cards[i]}"
 			if end_screen:
-				text = f"p -> {self.rank.index(i) + 1} {'(W)' if self.rank.index(i) == 0 else ''}"
+				text = f"{p} -> {self.rank.index(i) + 1} {'(W)' if self.rank.index(i) == 0 else ''}"
 			self.screen.blit(self.font.render(text, True, (0, 0, 0)), (text_start[0], text_start[1] + self.step_size * i))
 
 

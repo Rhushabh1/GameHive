@@ -109,6 +109,8 @@ class Server:
 
 	# handle client requests here
 	def handle_receive(self, msg, client):
+		if not msg:
+			return
 		r_type, data = msg.get("type"), msg.get("data")
 		if r_type == Protocols.Request.MOVE:		# validate the move 
 			valid = self.room.verify_move(self.clients.index(client), data)
